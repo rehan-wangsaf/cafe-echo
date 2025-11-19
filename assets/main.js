@@ -1,332 +1,184 @@
-// Echo Cafe - Main JavaScript
+// assets/main.js
 
-// Filter Menu by Category
-function filterMenu(categoryId) {
-  const items = document.querySelectorAll(".menu-item");
-  const buttons = document.querySelectorAll(".filter-btn");
-
-  buttons.forEach((btn) => {
-    btn.classList.remove("bg-amber-600", "text-white", "shadow-amber");
-    btn.classList.add("bg-white", "text-gray-700");
-  });
-
-  event.target.classList.remove("bg-white", "text-gray-700");
-  event.target.classList.add("bg-amber-600", "text-white", "shadow-amber");
-
-  items.forEach((item) => {
-    if (categoryId === "all" || item.dataset.category === categoryId) {
-      item.style.display = "block";
-      item.style.animation = "fadeIn 0.5s ease";
-    } else {
-      item.style.display = "none";
-    }
-  });
-}
-
-// Add to Cart with Animation
-async function addToCart(menuId, menuName, price) {
-  try {
-    const response = await fetch("add_to_cart.php", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      body: `menu_id=${menuId}&menu_name=${encodeURIComponent(
-        menuName
-      )}&price=${price}`,
+document.addEventListener('DOMContentLoaded', function() {
+    // 1. Initialize AOS (Animate On Scroll)
+    AOS.init({
+        once: true, // Animasi hanya sekali
+        offset: 100, // Trigger offset
+        duration: 800,
+        easing: 'ease-out-cubic',
     });
 
-    const data = await response.json();
+    // 2. Navbar Scroll Effect
+    const navbarContainer = document.querySelector('#nav-container');
+    const navbar = document.querySelector('#navbar');
+    
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 20) {
+            // Shrink padding & stronger background
+            navbar.classList.remove('py-4');
+            navbar.classList.add('py-2');
+            
+            navbarContainer.classList.add('bg-white/95', 'shadow-md');
+            navbarContainer.classList.remove('bg-white/80');
+        } else {
+            // Original State
+            navbar.classList.add('py-4');
+            navbar.classList.remove('py-2');
+            
+            navbarContainer.classList.remove('bg-white/95', 'shadow-md');
+            navbarContainer.classList.add('bg-white/80');
+        }
+    });
 
-    if (data.success) {
-      const cartCount = document.getElementById("cart-count");
-      cartCount.textContent = data.cart_count;
+    // 3. Counter Animation (Untuk Statistik Hero)
+    const counters = document.querySelectorAll('.count-up');
+    
+    // Intersection Observer untuk trigger animasi saat elemen terlihat
+    const observerOptions = { threshold: 0.5 };
+    
+    const statsObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const counter = entry.target;
+                const target = +counter.getAttribute('data-target');
+                const speed = 200; // Kecepatan animasi
+                
+                const updateCount = () => {
+                    const count = +counter.innerText;
+                    const inc = target / speed;
 
-      // Add pulse animation
-      cartCount.classList.add("pulse-badge");
-      setTimeout(() => {
-        cartCount.classList.remove("pulse-badge");
-      }, 1000);
+                    if (count < target) {
+                        counter.innerText = Math.ceil(count + inc);
+                        setTimeout(updateCount, 20);
+                    } else {
+                        counter.innerText = target + (target > 100 ? '+' : '');
+                    }
+                };
+                
+                updateCount();
+                observer.unobserve(counter); // Stop observing
+            }
+        });
+    }, observerOptions);
 
-      // Show success notification
-      showNotification(`${menuName} berhasil ditambahkan!`, "success");
+    counters.forEach(counter => {
+        statsObserver.observe(counter);
+    });
+});
+
+// 4. Filter Menu Logic (Smooth Transition)
+function filterMenu(categoryId) {
+    const items = document.querySelectorAll(".menu-item");
+    const buttons = document.querySelectorAll(".filter-btn");
+    
+    // Update Button Styles
+    // Reset semua tombol
+    buttons.forEach(btn => {
+        btn.classList.remove("active", "bg-amber-600", "text-white", "border-amber-600");
+        btn.classList.add("bg-white", "text-gray-600", "border-transparent");
+    });
+
+    // Set tombol aktif (event.target)
+    const activeBtn = event.currentTarget;
+    activeBtn.classList.remove("bg-white", "text-gray-600", "border-transparent");
+    activeBtn.classList.add("active", "bg-amber-600", "text-white", "border-amber-600");
+
+    // Filter Item
+    items.forEach(item => {
+        const parent = item.parentElement; // Kolom grid
+        
+        if (categoryId === "all" || item.dataset.category === categoryId) {
+            item.style.display = "flex"; // Kembalikan ke flex layout
+            // Animasi Masuk
+            setTimeout(() => {
+                item.style.opacity = "1";
+                item.style.transform = "translateY(0) scale(1)";
+            }, 50);
+        } else {
+            // Animasi Keluar
+            item.style.opacity = "0";
+            item.style.transform = "translateY(20px) scale(0.95)";
+            setTimeout(() => {
+                item.style.display = "none";
+            }, 300); // Tunggu transisi selesai baru hide
+        }
+    });
+    
+    // Refresh AOS agar layout tidak berantakan
+    setTimeout(() => AOS.refresh(), 400);
+}
+
+// 5. Add to Cart Logic (AJAX + Animation)
+async function addToCart(menuId, menuName, price) {
+    try {
+        const response = await fetch("add_to_cart.php", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: `menu_id=${menuId}&menu_name=${encodeURIComponent(menuName)}&price=${price}`,
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            // Update Badge Counter
+            const cartCount = document.getElementById("cart-count");
+            cartCount.textContent = data.cart_count;
+            
+            // Efek 'Pop' pada badge
+            cartCount.classList.add('scale-150', 'bg-amber-600', 'text-white');
+            setTimeout(() => {
+                cartCount.classList.remove('scale-150', 'bg-amber-600', 'text-white');
+            }, 200);
+
+            showNotification(`${menuName} berhasil ditambahkan!`, "success");
+        }
+    } catch (error) {
+        console.error(error);
+        showNotification("Gagal menambahkan item ke keranjang.", "error");
     }
-  } catch (error) {
-    showNotification("Terjadi kesalahan!", "error");
-  }
 }
 
-// Update Cart Quantity
-function updateQty(index, change) {
-  const input = document.getElementById(`qty-${index}`);
-  let newValue = parseInt(input.value) + change;
-  if (newValue < 1) newValue = 1;
-  input.value = newValue;
-}
+// 6. Toast Notification System
+function showNotification(message, type = "success") {
+    // Hapus notifikasi lama jika ada
+    const oldToast = document.querySelector('.toast-notification');
+    if(oldToast) oldToast.remove();
 
-// Toggle Modal with Animation
-function toggleModal(modalId = "modal") {
-  const modal = document.getElementById(modalId);
-  const modalContent = modal.querySelector("div > div");
+    const notification = document.createElement("div");
+    
+    // Style berdasarkan tipe
+    const styleClass = type === "success" 
+        ? "bg-white border-l-4 border-amber-500 text-gray-800" 
+        : "bg-red-50 border-l-4 border-red-500 text-red-800";
+        
+    const icon = type === "success" ? "fa-check-circle text-amber-500" : "fa-exclamation-circle text-red-500";
 
-  if (modal.classList.contains("hidden")) {
-    modal.classList.remove("hidden");
-    modal.classList.add("flex");
-    setTimeout(() => {
-      modalContent.classList.add("modal-enter");
-    }, 10);
-  } else {
-    modalContent.classList.remove("modal-enter");
-    setTimeout(() => {
-      modal.classList.add("hidden");
-      modal.classList.remove("flex");
-    }, 200);
-  }
-}
-
-// Toggle Delivery Address Field
-function toggleAlamat(show) {
-  const alamatField = document.getElementById("alamat-field");
-  const alamatTextarea = alamatField.querySelector("textarea");
-
-  if (show) {
-    alamatField.classList.remove("hidden");
-    alamatField.style.animation = "fadeIn 0.3s ease";
-    alamatTextarea.required = true;
-  } else {
-    alamatField.classList.add("hidden");
-    alamatTextarea.required = false;
-  }
-}
-
-// Show Notification
-function showNotification(message, type = "info") {
-  const notification = document.createElement("div");
-  const colors = {
-    success: "bg-green-500",
-    error: "bg-red-500",
-    info: "bg-blue-500",
-    warning: "bg-yellow-500",
-  };
-
-  notification.className = `fixed top-4 right-4 ${colors[type]} text-white px-6 py-3 rounded-lg shadow-lg z-50 transform transition-all duration-300`;
-  notification.style.transform = "translateX(400px)";
-  notification.innerHTML = `
-        <div class="flex items-center gap-2">
-            <i class="fas fa-${
-              type === "success"
-                ? "check-circle"
-                : type === "error"
-                ? "exclamation-circle"
-                : "info-circle"
-            }"></i>
-            <span>${message}</span>
+    notification.className = `toast-notification fixed bottom-8 right-8 ${styleClass} px-6 py-4 rounded-lg shadow-2xl z-50 transform translate-y-20 opacity-0 transition-all duration-500 flex items-center gap-4 min-w-[300px]`;
+    
+    notification.innerHTML = `
+        <i class="fas ${icon} text-xl"></i>
+        <div>
+            <h4 class="font-bold text-sm uppercase tracking-wider mb-0.5">${type === 'success' ? 'Sukses' : 'Error'}</h4>
+            <p class="text-sm font-medium">${message}</p>
         </div>
     `;
 
-  document.body.appendChild(notification);
+    document.body.appendChild(notification);
 
-  setTimeout(() => {
-    notification.style.transform = "translateX(0)";
-  }, 10);
+    // Animasi Masuk
+    requestAnimationFrame(() => {
+        notification.classList.remove('translate-y-20', 'opacity-0');
+    });
 
-  setTimeout(() => {
-    notification.style.transform = "translateX(400px)";
+    // Hilang otomatis setelah 3 detik
     setTimeout(() => {
-      notification.remove();
-    }, 300);
-  }, 3000);
+        notification.classList.add('translate-y-20', 'opacity-0');
+        setTimeout(() => notification.remove(), 500);
+    }, 3000);
 }
 
-// Smooth Scroll to Section
-function scrollToSection(sectionId) {
-  const section = document.getElementById(sectionId);
-  if (section) {
-    section.scrollIntoView({ behavior: "smooth", block: "start" });
-  }
-}
-
-// Initialize AOS (Animate on Scroll) - if needed
-document.addEventListener("DOMContentLoaded", function () {
-  // Add fade-in animation to cards
-  const cards = document.querySelectorAll(".card-hover");
-  cards.forEach((card, index) => {
-    card.style.opacity = "0";
-    card.style.transform = "translateY(20px)";
-    setTimeout(() => {
-      card.style.transition = "all 0.5s ease";
-      card.style.opacity = "1";
-      card.style.transform = "translateY(0)";
-    }, index * 100);
-  });
-
-  // Add active class to current page in sidebar
-  const currentPage = window.location.pathname.split("/").pop();
-  const sidebarLinks = document.querySelectorAll(".sidebar-link");
-  sidebarLinks.forEach((link) => {
-    if (link.getAttribute("href") === currentPage) {
-      link.classList.add("active");
-    }
-  });
-});
-
-// Format Currency
+// 7. Format Rupiah Helper (Optional usage)
 function formatRupiah(angka) {
-  return "Rp " + angka.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(angka);
 }
-
-// Confirm Delete
-function confirmDelete(message = "Yakin ingin menghapus data ini?") {
-  return confirm(message);
-}
-
-// Print Report
-function printReport() {
-  window.print();
-}
-
-// Export to Excel (if needed in future)
-function exportToExcel(tableId, filename = "report") {
-  // Placeholder for future implementation
-  showNotification("Fitur export akan segera hadir!", "info");
-}
-
-// Copy to Clipboard
-function copyToClipboard(text) {
-  navigator.clipboard
-    .writeText(text)
-    .then(() => {
-      showNotification("Berhasil disalin!", "success");
-    })
-    .catch(() => {
-      showNotification("Gagal menyalin!", "error");
-    });
-}
-
-// Debounce Function for Search
-function debounce(func, wait) {
-  let timeout;
-  return function executedFunction(...args) {
-    const later = () => {
-      clearTimeout(timeout);
-      func(...args);
-    };
-    clearTimeout(timeout);
-    timeout = setTimeout(later, wait);
-  };
-}
-
-// Search Function
-const searchItems = debounce(function (searchTerm) {
-  const items = document.querySelectorAll(".searchable-item");
-  items.forEach((item) => {
-    const text = item.textContent.toLowerCase();
-    if (text.includes(searchTerm.toLowerCase())) {
-      item.style.display = "";
-    } else {
-      item.style.display = "none";
-    }
-  });
-}, 300);
-
-// Initialize tooltips
-function initTooltips() {
-  const tooltips = document.querySelectorAll("[data-tooltip]");
-  tooltips.forEach((element) => {
-    element.addEventListener("mouseenter", function () {
-      const tooltip = document.createElement("div");
-      tooltip.className = "tooltip";
-      tooltip.textContent = this.dataset.tooltip;
-      // Add tooltip logic here
-    });
-  });
-}
-
-// Loading State
-function showLoading(buttonId) {
-  const button = document.getElementById(buttonId);
-  if (button) {
-    button.disabled = true;
-    button.innerHTML =
-      '<span class="spinner inline-block mr-2"></span> Loading...';
-  }
-}
-
-function hideLoading(buttonId, originalText) {
-  const button = document.getElementById(buttonId);
-  if (button) {
-    button.disabled = false;
-    button.innerHTML = originalText;
-  }
-}
-
-document.addEventListener("DOMContentLoaded", function () {
-  const carousel = document.getElementById("hero-carousel");
-  const dotsContainer = document.getElementById("carousel-dots");
-  const slides = carousel.children;
-  const totalSlides = slides.length;
-  let currentSlide = 0;
-
-  // 1. Create Dots
-  for (let i = 0; i < totalSlides; i++) {
-    const dot = document.createElement("button");
-    dot.classList.add(
-      "w-3",
-      "h-3",
-      "rounded-full",
-      "bg-gray-400",
-      "hover:bg-amber-600",
-      "transition"
-    );
-    dot.setAttribute("data-slide-to", i);
-    dot.addEventListener("click", () => {
-      goToSlide(i);
-    });
-    dotsContainer.appendChild(dot);
-  }
-
-  const dots = dotsContainer.children;
-
-  // 2. Function to update carousel position
-  function goToSlide(index) {
-    currentSlide = index;
-    // Scroll to the specific slide (which snaps into view due to Tailwind's snap-x)
-    carousel.scrollLeft = slides[index].offsetLeft;
-    updateDots();
-  }
-
-  // 3. Function to update dot color
-  function updateDots() {
-    for (let i = 0; i < totalSlides; i++) {
-      dots[i].classList.remove("bg-amber-600");
-      dots[i].classList.add("bg-gray-400");
-    }
-    if (dots[currentSlide]) {
-      dots[currentSlide].classList.remove("bg-gray-400");
-      dots[currentSlide].classList.add("bg-amber-600");
-    }
-  }
-
-  // 4. Autoplay (Optional)
-  const intervalTime = 5000; // 5 seconds
-  setInterval(() => {
-    let nextSlide = (currentSlide + 1) % totalSlides;
-    goToSlide(nextSlide);
-  }, intervalTime);
-
-  // 5. Update dots on manual scroll (e.g., swipe) - DEBOUNCED
-  let scrollTimeout;
-  carousel.addEventListener("scroll", () => {
-    clearTimeout(scrollTimeout);
-    scrollTimeout = setTimeout(() => {
-      const scrollLeft = carousel.scrollLeft;
-      const slideWidth = carousel.clientWidth;
-      // Calculate which slide is closest to the left edge
-      currentSlide = Math.round(scrollLeft / slideWidth);
-      updateDots();
-    }, 100); // Wait 100ms after scrolling stops
-  });
-
-  // Initialize first slide and dots
-  updateDots();
-});

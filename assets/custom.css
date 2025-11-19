@@ -1,277 +1,100 @@
-/* Echo Cafe - Custom Styles */
+/* assets/custom.css */
 
 :root {
-  --primary: #d97706;
-  --primary-dark: #b45309;
-  --primary-light: #fbbf24;
-  --secondary: #78350f;
-  --accent: #f59e0b;
+    --primary: #d97706; /* Amber 600 */
+    --primary-light: #fbbf24; /* Amber 400 */
 }
 
-/* Smooth Scroll */
+/* Smooth Scrolling */
 html {
-  scroll-behavior: smooth;
+    scroll-behavior: smooth;
+}
+
+/* Font Setup Global */
+body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+h1, h2, h3, h4, .font-serif {
+    font-family: 'Playfair Display', serif;
+}
+
+/* Animations Keyframes */
+@keyframes blob {
+    0% { transform: translate(0px, 0px) scale(1); }
+    33% { transform: translate(30px, -50px) scale(1.1); }
+    66% { transform: translate(-20px, 20px) scale(0.9); }
+    100% { transform: translate(0px, 0px) scale(1); }
+}
+
+.animate-blob {
+    animation: blob 7s infinite ease-in-out;
+}
+
+.animation-delay-2000 {
+    animation-delay: 2s;
+}
+
+@keyframes bounce-slow {
+    0%, 100% { transform: translate(-50%, -50%) translateY(0); }
+    50% { transform: translate(-50%, -50%) translateY(-15px); }
+}
+
+.animate-bounce-slow {
+    animation: bounce-slow 3s infinite ease-in-out;
+}
+
+@keyframes fade-in-up {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in-up {
+    animation: fade-in-up 0.8s ease-out forwards;
+}
+
+/* Navbar Active State */
+.nav-link.active {
+    color: var(--primary);
+    font-weight: 700;
+}
+
+/* Filter Button Styles */
+.filter-btn.active {
+    background-color: var(--primary);
+    color: white;
+    border-color: var(--primary);
 }
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
+    width: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
+    background: #f5f5f4;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--primary);
-  border-radius: 4px;
+    background: #d6d3d1;
+    border-radius: 5px;
+    border: 2px solid #f5f5f4;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--primary-dark);
+    background: var(--primary);
 }
 
-/* Glassmorphism Effect */
-.glass-effect {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-}
-
-/* Card Hover Animation */
-.card-hover {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.card-hover:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
-    0 10px 10px -5px rgba(0, 0, 0, 0.04);
-}
-
-/* Button Ripple Effect */
-.btn-ripple {
-  position: relative;
-  overflow: hidden;
-}
-
-.btn-ripple::after {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 0;
-  height: 0;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.5);
-  transform: translate(-50%, -50%);
-  transition: width 0.6s, height 0.6s;
-}
-
-.btn-ripple:active::after {
-  width: 300px;
-  height: 300px;
-}
-
-/* Gradient Text */
-.gradient-text {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-/* Menu Card Image Overlay */
-.menu-card-overlay {
-  position: relative;
-  overflow: hidden;
-}
-
-.menu-card-overlay::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    to bottom,
-    transparent 0%,
-    rgba(0, 0, 0, 0.3) 100%
-  );
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.menu-card-overlay:hover::before {
-  opacity: 1;
-}
-
-/* Floating Animation */
-@keyframes float {
-  0%,
-  100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
-}
-
-.float-animation {
-  animation: float 3s ease-in-out infinite;
-}
-
-/* Pulse Animation for Badges */
-@keyframes pulse-badge {
-  0%,
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.8;
-    transform: scale(1.05);
-  }
-}
-
-.pulse-badge {
-  animation: pulse-badge 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-/* Sidebar Active Link Effect */
-.sidebar-link {
-  position: relative;
-  transition: all 0.3s ease;
-}
-
-.sidebar-link::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 0;
-  height: 100%;
-  width: 4px;
-  background: white;
-  transform: scaleY(0);
-  transition: transform 0.3s ease;
-}
-
-.sidebar-link.active::before {
-  transform: scaleY(1);
-}
-
-/* Table Row Hover */
-.table-row-hover {
-  transition: all 0.2s ease;
-}
-
-.table-row-hover:hover {
-  background: linear-gradient(to right, rgba(251, 191, 36, 0.05), transparent);
-  transform: translateX(4px);
-}
-
-/* Modal Animation */
-.modal-enter {
-  animation: modalEnter 0.3s ease-out;
-}
-
-@keyframes modalEnter {
-  from {
-    opacity: 0;
-    transform: scale(0.9) translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
-}
-
-/* Status Badge Glow */
-.status-badge-glow {
-  box-shadow: 0 0 10px currentColor;
-  animation: glow 2s ease-in-out infinite;
-}
-
-@keyframes glow {
-  0%,
-  100% {
-    box-shadow: 0 0 5px currentColor;
-  }
-  50% {
-    box-shadow: 0 0 20px currentColor;
-  }
-}
-
-/* Loading Spinner */
-.spinner {
-  border: 3px solid rgba(0, 0, 0, 0.1);
-  border-left-color: var(--primary);
-  border-radius: 50%;
-  width: 24px;
-  height: 24px;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-/* Custom Shadow */
-.shadow-amber {
-  box-shadow: 0 10px 15px -3px rgba(217, 119, 6, 0.1),
-    0 4px 6px -2px rgba(217, 119, 6, 0.05);
+/* Card & Shadows */
+.shadow-amber-md {
+    box-shadow: 0 4px 6px -1px rgba(217, 119, 6, 0.3), 0 2px 4px -1px rgba(217, 119, 6, 0.15);
 }
 
 .shadow-amber-lg {
-  box-shadow: 0 20px 25px -5px rgba(217, 119, 6, 0.1),
-    0 10px 10px -5px rgba(217, 119, 6, 0.04);
+    box-shadow: 0 10px 15px -3px rgba(217, 119, 6, 0.4), 0 4px 6px -2px rgba(217, 119, 6, 0.2);
 }
 
-/* Input Focus Effect */
-.input-focus {
-  transition: all 0.3s ease;
-}
-
-.input-focus:focus {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 6px -1px rgba(217, 119, 6, 0.1),
-    0 2px 4px -1px rgba(217, 119, 6, 0.06);
-}
-
-/* Print Styles */
-@media print {
-  .no-print {
-    display: none !important;
-  }
-
-  body {
-    background: white !important;
-  }
-
-  .shadow-md,
-  .shadow-lg,
-  .shadow-xl {
-    box-shadow: none !important;
-  }
-}
-
-/* Custom CSS untuk Carousel */
-.carousel-container {
-  /* Untuk memastikan scrollbar tidak terlihat, tapi tetap bisa di-scroll secara programatik */
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
-}
-.carousel-container::-webkit-scrollbar {
-  display: none; /* Chrome, Safari, Opera */
-}
-.gradient-text {
-  /* Asumsi class ini sudah ada atau perlu ditambahkan di file CSS/Style */
-  background-image: linear-gradient(to right, #f59e0b, #ea580c);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  color: transparent;
+/* Utility for text stroke/outline if needed */
+.text-stroke {
+    -webkit-text-stroke: 1px #fff;
 }
