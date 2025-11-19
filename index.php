@@ -21,7 +21,7 @@ if (!isset($_SESSION['cart'])) {
     <title>Echo Cafe - Order Online</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="assets/css/custom.css">
+    <link rel="stylesheet" href="assets/custom.css">
 </head>
 
 <body class="bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50">
@@ -32,13 +32,14 @@ if (!isset($_SESSION['cart'])) {
                 <div class="flex justify-between items-center">
                     <!-- Logo -->
                     <div class="flex items-center gap-3">
-                        <div class="w-14 h-14 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center shadow-lg">
+                        <!-- <div class="w-14 h-14 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center shadow-lg">
                             <i class="fas fa-coffee text-white text-xl"></i>
                         </div>
                         <div class="hidden sm:block">
                             <h1 class="font-bold text-xl gradient-text">Echo Cafe</h1>
                             <p class="text-xs text-gray-600">Premium Coffee & Snacks</p>
-                        </div>
+                        </div> -->
+                        <img src="assets/logo.png" alt="Logo" class="h-14 w-auto">
                     </div>
                     
                     <!-- Menu -->
@@ -322,6 +323,6 @@ if (!isset($_SESSION['cart'])) {
     </footer>
 
     <!-- Scripts -->
-    <script src="assets/js/main.js"></script>
+    <script src="assets/main.js"></script>
 </body>
 </html>
